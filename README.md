@@ -1,6 +1,18 @@
-# Search Result Extractor
+# WebSearchPup - A Web Search Command Line Tool
 
-A modular web scraper built with TypeScript and Puppeteer for extracting search results from search engines.
+A modular web scraper built with TypeScript and Puppeteer for extracting search results from search engines. This tool allows you to perform web searches from the command line and save the results for later analysis or AI processing.
+
+You can trigger it via:
+```bash
+npx ts-node src/index.ts "your search query" "output_folder_path"
+```
+
+For example:
+```bash
+npx ts-node src/index.ts "how to do reinforcement learning on cybersecurity 3rd party log parsing?" "search_results_folder"
+```
+
+And later you can use LLM/AI tools to digest the outcome.
 
 ## Features
 
@@ -12,13 +24,14 @@ A modular web scraper built with TypeScript and Puppeteer for extracting search 
 - Save results in multiple formats (JSON, TXT, CSV, HTML)
 - Take screenshots of search results pages
 - Perform follow-up searches on specific results
+- Specify custom output directories
 
 ## Installation
 
 ```bash
 # Clone the repository
 git clone https://github.com/sparktsao/WebSearchPup.git
-cd search-result-extractor
+cd WebSearchPup
 
 # Install dependencies
 npm install
@@ -48,7 +61,7 @@ import { SearchResultScraper, ScraperConfig, OutputFormat } from './src';
 async function example() {
   const config: ScraperConfig = {
     searchQuery: 'puppeteer tutorial',
-    headless: false,
+    headless: true,  // Browser runs in headless mode by default
     slowMo: 50,
     outputDir: './search-results-puppeteer-tutorial',
     extractOptions: {
@@ -78,7 +91,7 @@ example().catch(console.error);
 ## Project Structure
 
 ```
-search-result-extractor/
+WebSearchPup/
 ├── src/
 │   ├── config/
 │   │   ├── default-config.ts   # Default configuration values
@@ -89,7 +102,8 @@ search-result-extractor/
 │   │   ├── featured-snippets-extractor.ts
 │   │   ├── people-also-ask-extractor.ts
 │   │   ├── related-searches-extractor.ts
-│   │   └── video-results-extractor.ts
+│   │   ├── video-results-extractor.ts
+│   │   └── image-results-extractor.ts
 │   ├── output/
 │   │   ├── result-formatter.ts # Formats results in different formats
 │   │   └── result-saver.ts     # Saves results to files
@@ -116,7 +130,7 @@ The scraper can save results in the following formats:
 You can customize the scraper behavior with the following configuration options:
 
 - `searchQuery`: The search query to use
-- `headless`: Whether to run the browser in headless mode
+- `headless`: Whether to run the browser in headless mode (default: true)
 - `slowMo`: Slow down operations by the specified amount of milliseconds
 - `outputDir`: Directory to save results to
 - `extractOptions`: Options for what to extract
@@ -125,6 +139,7 @@ You can customize the scraper behavior with the following configuration options:
   - `peopleAlsoAsk`: Extract "People Also Ask" questions
   - `relatedSearches`: Extract related searches
   - `videos`: Extract video results
+  - `images`: Extract image results (disabled by default)
 
 ## License
 
