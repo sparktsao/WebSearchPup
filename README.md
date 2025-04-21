@@ -1,17 +1,6 @@
 # WebSearchPup - A Web Search Command Line Tool
 
 A modular web scraper built with TypeScript and Puppeteer for extracting search results from search engines. This tool allows you to perform web searches from the command line and save the results for later analysis or AI processing.
-
-You can trigger it via:
-```bash
-npx ts-node src/index.ts "your search query" "output_folder_path"
-```
-
-For example:
-```bash
-npx ts-node src/index.ts "how to do reinforcement learning on cybersecurity 3rd party log parsing?" "search_results_folder"
-```
-
 And later you can use LLM/AI tools to digest the outcome.
 
 ## Features
