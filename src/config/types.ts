@@ -97,3 +97,46 @@ export enum OutputFormat {
   CSV = 'csv',
   HTML = 'html'
 }
+
+/**
+ * Timing data for performance measurement
+ */
+export interface TimingData {
+  // Main process steps
+  steps: {
+    // Search scraper steps
+    browserInitialization?: number;
+    searchExecution?: number;
+    totalExtraction?: number;
+    saveResults?: number;
+    browserCleanup?: number;
+    
+    // Crawler steps
+    pageNavigation?: number;
+    selectorWait?: number;
+    contentExtraction?: number;
+    htmlSave?: number;
+    screenshotCapture?: number;
+    totalCrawlTime?: number;
+    
+    // Any other steps can be added here
+    [key: string]: number | undefined;
+  };
+  
+  // Individual extraction steps
+  extractionSteps: {
+    organicResults?: number;
+    featuredSnippets?: number;
+    peopleAlsoAsk?: number;
+    relatedSearches?: number;
+    videos?: number;
+    images?: number;
+    pageText?: number;
+    
+    // Any other extraction steps can be added here
+    [key: string]: number | undefined;
+  };
+  
+  // Format-specific save times
+  saveFormats?: Record<string, number>;
+}

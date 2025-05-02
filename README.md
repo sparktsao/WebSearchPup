@@ -14,6 +14,8 @@ And later you can use LLM/AI tools to digest the outcome.
 - Take screenshots of search results pages
 - Perform follow-up searches on specific results
 - Specify custom output directories
+- Generic web crawler for downloading HTML content from any URL
+- Performance timing for all operations with detailed summary table
 
 ## Installation
 
@@ -98,7 +100,8 @@ WebSearchPup/
 │   │   └── result-saver.ts     # Saves results to files
 │   ├── scraper/
 │   │   ├── browser-manager.ts  # Manages browser initialization and cleanup
-│   │   └── search-result-scraper.ts # Main scraper class
+│   │   ├── search-result-scraper.ts # Main scraper class
+│   │   └── crawler.ts          # Generic web crawler
 │   └── index.ts                # Entry point
 ├── package.json
 ├── tsconfig.json
@@ -129,6 +132,94 @@ You can customize the scraper behavior with the following configuration options:
   - `relatedSearches`: Extract related searches
   - `videos`: Extract video results
   - `images`: Extract image results (disabled by default)
+
+## Performance Timing
+
+The scraper includes detailed timing measurements for all operations. At the end of execution, a summary table is displayed showing the time spent on each step and its percentage of the total execution time:
+
+```
+=== TIMING SUMMARY ===
+
+| Step                           |       Time |     % |
+|--------------------------------|------------|-------|
+| Browser Initialization         |      1.61s |    9.3% |
+| Search Execution               |     13.13s |   76.0% |
+| Total Extraction               |      1.93s |   11.2% |
+| Save Results                   |   475.15ms |    2.8% |
+| Browser Cleanup                |   120.00ms |    0.7% |
+|--------------------------------|------------|-------|
+| Extraction Steps:              |            |       |
+|--------------------------------|------------|-------|
+|   Organic Results              |   367.45ms |    2.1% |
+|   Featured Snippets            |   372.74ms |    2.2% |
+|   People Also Ask              |   369.05ms |    2.1% |
+|   Related Searches             |   378.37ms |    2.2% |
+|   Videos                       |   374.26ms |    2.2% |
+|   Page Text                    |    61.67ms |    0.4% |
+|--------------------------------|------------|-------|
+| Save Formats:                 |            |       |
+|--------------------------------|------------|-------|
+|   JSON                         |   256.68ms |    1.5% |
+|   TEXT                         |   218.21ms |    1.3% |
+|--------------------------------|------------|-------|
+| TOTAL                          |     17.27s |  100.0% |
+```
+
+This timing information helps identify performance bottlenecks and optimize the scraping process.
+
+## Generic Web Crawler
+
+The project also includes a generic web crawler that can download HTML content from any URL:
+
+### Command Line Usage
+
+```bash
+# Basic usage
+npx ts-node src/scraper/crawler.ts <url> <output-folder>
+
+# With screenshot
+npx ts-node src/scraper/crawler.ts <url> <output-folder> --screenshot
+
+# Example
+npx ts-node src/scraper/crawler.ts https://example.com ./crawl-results --screenshot
+```
+
+### As a Module
+
+```typescript
+import { Crawler } from './src/scraper/crawler';
+
+async function example() {
+  // Create a crawler (headless mode, no slowdown)
+  const crawler = new Crawler(true, 0);
+  
+  try {
+    // Crawl a single URL
+    const filePath = await crawler.crawl('https://example.com', './crawl-results', {
+      takeScreenshot: true,
+      timeout: 30000,
+      waitForSelector: 'h1', // Optional: wait for a specific element
+      filename: 'custom-name' // Optional: specify a custom filename
+    });
+    
+    console.log(`HTML saved to: ${filePath}`);
+    
+    // Crawl multiple URLs
+    const urls = ['https://example.org', 'https://example.net'];
+    const results = await crawler.crawlMultiple(urls, './crawl-results', {
+      takeScreenshot: true,
+      concurrency: 2 // Process 2 URLs at a time
+    });
+    
+    console.log(`Saved ${results.length} files`);
+  } finally {
+    // Always close the browser when done
+    await crawler.close();
+  }
+}
+```
+
+See `examples/basic-crawler.ts` for more detailed examples.
 
 ## License
 

@@ -43,9 +43,88 @@ function displayUsage(): void {
 }
 
 /**
+ * Format milliseconds to a readable string
+ * @param ms Milliseconds
+ * @returns Formatted string (e.g., "1.23s" or "123ms")
+ */
+function formatTime(ms: number): string {
+  return ms >= 1000 ? `${(ms / 1000).toFixed(2)}s` : `${ms.toFixed(2)}ms`;
+}
+
+/**
+ * Create a table row for the timing summary
+ * @param label Row label
+ * @param time Time in milliseconds
+ * @param total Total time for percentage calculation
+ * @returns Formatted table row
+ */
+function createTableRow(label: string, time: number, total: number): string {
+  const percentage = ((time / total) * 100).toFixed(1);
+  return `| ${label.padEnd(30)} | ${formatTime(time).padStart(10)} | ${percentage.padStart(6)}% |`;
+}
+
+/**
+ * Display timing summary as a table
+ * @param timingData Timing data object
+ * @param totalTime Total execution time
+ */
+function displayTimingSummary(timingData: any, totalTime: number): void {
+  console.log('\n=== TIMING SUMMARY ===\n');
+  
+  // Table header
+  console.log('| Step                           |       Time |     % |');
+  console.log('|--------------------------------|------------|-------|');
+  
+  // Main steps
+  if (timingData.steps) {
+    for (const [key, value] of Object.entries(timingData.steps)) {
+      // Convert camelCase to Title Case with spaces
+      const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+      console.log(createTableRow(label, value as number, totalTime));
+    }
+  }
+  
+  // Separator for extraction steps
+  console.log('|--------------------------------|------------|-------|');
+  console.log('| Extraction Steps:              |            |       |');
+  console.log('|--------------------------------|------------|-------|');
+  
+  // Extraction steps
+  if (timingData.extractionSteps) {
+    for (const [key, value] of Object.entries(timingData.extractionSteps)) {
+      // Convert camelCase to Title Case with spaces
+      const label = `  ${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}`;
+      console.log(createTableRow(label, value as number, totalTime));
+    }
+  }
+  
+  // Separator for save formats
+  if (timingData.saveFormats && Object.keys(timingData.saveFormats).length > 0) {
+    console.log('|--------------------------------|------------|-------|');
+    console.log('| Save Formats:                 |            |       |');
+    console.log('|--------------------------------|------------|-------|');
+    
+    // Save formats
+    for (const [key, value] of Object.entries(timingData.saveFormats)) {
+      const label = `  ${key.toUpperCase()}`;
+      console.log(createTableRow(label, value as number, totalTime));
+    }
+  }
+  
+  // Total row
+  console.log('|--------------------------------|------------|-------|');
+  console.log(createTableRow('TOTAL', totalTime, totalTime));
+  console.log('');
+}
+
+/**
  * Main function to run the scraper
  */
 async function main() {
+  // Start timing
+  const startTime = performance.now();
+  console.log(`[TIMER] Start: ${new Date().toISOString()}`);
+  
   // Display usage information
   displayUsage();
   
@@ -83,6 +162,17 @@ async function main() {
     if (results.organicResults && results.organicResults.length > 0) {
       console.log('\nTo perform a follow-up search on the first result, run:');
       console.log('  const followUpResults = await scraper.performFollowUpSearch(0);');
+    }
+    
+    // End timing
+    const endTime = performance.now();
+    const totalTime = endTime - startTime;
+    console.log(`[TIMER] End: ${new Date().toISOString()}`);
+    console.log(`[TIMER] Total time: ${totalTime.toFixed(2)}ms (${(totalTime / 1000).toFixed(2)}s)`);
+    
+    // Display timing summary table
+    if (results.timingData) {
+      displayTimingSummary(results.timingData, totalTime);
     }
   } catch (error) {
     console.error('An error occurred during scraping:', error);
