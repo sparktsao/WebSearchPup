@@ -56,6 +56,8 @@ async function main() {
   if (outputDir) {
     console.log(`Output directory: "${outputDir}"\n`);
   }
+
+  console.log("Current working directory:", process.cwd());
   
   // Configure the scraper
   const config: ScraperConfig = {
@@ -98,5 +100,6 @@ if (require.main === module) {
 
 // Export for use as a module
 export { SearchResultScraper } from './scraper/search-result-scraper';
+export { Crawler } from './scraper/crawler';
 export { ScraperConfig, OutputFormat } from './config/types';
 export { DEFAULT_CONFIG, DEFAULT_OUTPUT_FORMATS } from './config/default-config';
